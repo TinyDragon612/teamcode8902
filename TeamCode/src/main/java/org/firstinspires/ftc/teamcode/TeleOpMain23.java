@@ -227,7 +227,7 @@ public class TeleOpMain23 extends LinearOpMode {
 
                 //GAMEPAD1 CONTROLS
 
-                /*
+
 
                 switch(drive){
                     case FORWARD:
@@ -242,6 +242,11 @@ public class TeleOpMain23 extends LinearOpMode {
                         bottomRight.setPower(((gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
                         bottomLeft.setPower(((-gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
 
+                        if(gamepad1.a){
+                            drive = driveState.BACKWARD;
+                        }
+                        break;
+
                     case BACKWARD:
 
                         topRight.setDirection(DcMotorEx.Direction.REVERSE);
@@ -254,14 +259,22 @@ public class TeleOpMain23 extends LinearOpMode {
                         bottomRight.setPower(((gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (-gamepad1.right_stick_x));
                         bottomLeft.setPower(((-gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (-gamepad1.right_stick_x));
 
+                        if(gamepad1.y){
+                            drive = driveState.FORWARD;
+                        }
+                        break;
+
                 }
 
-                 */
+                /*
+                //THE GOOD STUFF
 
                 topRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
                 topLeft.setPower(((-gamepad1.left_stick_y + gamepad1.left_stick_x)) + ((gamepad1.right_stick_x)));
                 bottomRight.setPower(((gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
                 bottomLeft.setPower(((-gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
+
+                 */
 
 
                 if (gamepad1.dpad_down) {
@@ -291,7 +304,7 @@ public class TeleOpMain23 extends LinearOpMode {
                     bigflip2.setPosition(0.5);
                 }
 
-                if (gamepad1.a) {
+                if (gamepad1.b) {
                     drawerState = State.BAD;
                 }
 
@@ -320,20 +333,20 @@ public class TeleOpMain23 extends LinearOpMode {
                     bigflip1.setPosition(0.2);
                     bigflip2.setPosition(0.8);
 
-                    if (gamepad2.dpad_left) {
-                        servoTimer.reset();
-                        poolNoodle.setPosition(0.7);
+                }
 
-                        if (servoTimer.seconds() > 20) {
-                            poolNoodle.setPwmDisable();
-                        }
+                if (gamepad2.dpad_left) {
+                    servoTimer.reset();
+                    poolNoodle.setPosition(0.7);
+
+                    if (servoTimer.seconds() > 20) {
+                        poolNoodle.setPwmDisable();
                     }
+                }
 
-                    if (gamepad2.dpad_right) {
-
-                    }
-
-
+                if (gamepad2.dpad_right) {
+                    poolNoodle.setPwmEnable();
+                    poolNoodle.setPosition(0);
                 }
 
 
