@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime.Resolution;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 
-@TeleOp(name="LoHicimos", group="Linear Opmode")
+@TeleOp(name= "\uD83D\uDC7D LoHicimos", group="Linear Opmode")
 //@Disabled
 public class TeleOpMain23 extends LinearOpMode {
 

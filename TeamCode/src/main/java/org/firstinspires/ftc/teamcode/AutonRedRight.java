@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 
 @Config
-@Autonomous(group = "drive")
+@Autonomous(name = "\uD83D\uDFE5 AutonRedRight", group = "drive")
 public class AutonRedRight extends LinearOpMode {
 
     private DcMotorEx blueboi1, blueboi2;
@@ -146,20 +146,20 @@ public class AutonRedRight extends LinearOpMode {
         TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose) //DONE
                 .forward(27)
                 .turn(Math.toRadians(80))
-                .forward(4)
+                .forward(3)
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end()) //DONE
-                .back(40)
-                .strafeRight(4) //og 1.5
-                .back(8,
+                .back(30)
+                .strafeRight(17) //og 1.5
+                .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end()) //DONE
                 .forward(5)
-                .strafeLeft(35) //og 40
+                .strafeLeft(37) //og 40
                 .back(20)
                 .build();
 
@@ -302,7 +302,7 @@ public class AutonRedRight extends LinearOpMode {
                         break;
                     case DRAWER_START:
                         if (!drive.isBusy()) {
-                            setDrawerHeight(410); //og 450
+                            setDrawerHeight(350); //og 410
                             currentState = State.DRAWER_FLIP_OUT;
                         }
                         break;

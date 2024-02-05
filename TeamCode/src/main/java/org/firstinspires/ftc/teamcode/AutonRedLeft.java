@@ -25,7 +25,7 @@ import com.qualcomm.robotcore.util.Range;
 
 //@Disabled
 @Config
-@Autonomous(group = "drive")
+@Autonomous(name = "\uD83D\uDFE5 AutonRedLeft", group = "drive")
 public class AutonRedLeft extends LinearOpMode {
     private DcMotorEx blueboi1, blueboi2;
     private int errorBound = 60;
@@ -145,8 +145,8 @@ public class AutonRedLeft extends LinearOpMode {
 
         TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
                 .forward(70)
-                .strafeRight(20)
-                .turn(Math.toRadians(200))
+                .strafeRight(19)
+                .turn(Math.toRadians(188))
                 .back(20,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))

@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 //@Disabled
 @Config
-@Autonomous(group = "drive")
+@Autonomous(name= "\uD83D\uDFE6 AutonBlueRight", group = "drive")
 public class AutonBlueRight extends LinearOpMode {
     private DcMotorEx blueboi1, blueboi2;
     private Servo littleflip;
@@ -123,8 +123,8 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .forward(90)
-                .strafeLeft(40)
-                .turn(Math.toRadians(200)) //230
+                .strafeLeft(30)
+                .turn(Math.toRadians(190))
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -164,7 +164,7 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
                 .forward(75)
-                .strafeLeft(52)
+                .strafeLeft(55)
                 .turn(Math.toRadians(190)) //230
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),

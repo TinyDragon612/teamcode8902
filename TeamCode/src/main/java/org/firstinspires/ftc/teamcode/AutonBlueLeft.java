@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.PipelineTest;
 
 //@Disabled
 @Config
-@Autonomous(group = "drive")
+@Autonomous(name= "\uD83D\uDFE6 AutonBlueLeft", group = "drive")
 public class AutonBlueLeft extends LinearOpMode {
 
     private DcMotorEx blueboi1, blueboi2;
@@ -126,9 +126,9 @@ public class AutonBlueLeft extends LinearOpMode {
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
                 .back(7.5)
-                .turn(Math.toRadians(-90))
+                .turn(Math.toRadians(-80))
+                .strafeLeft(5)
                 .back(40)
-                .strafeLeft(10)
                 .build();
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
@@ -162,7 +162,7 @@ public class AutonBlueLeft extends LinearOpMode {
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end()) //DONE
                 .back(13)
-                .strafeRight(20)
+                .strafeRight(22)
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -175,15 +175,15 @@ public class AutonBlueLeft extends LinearOpMode {
                 .build();
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
-                .forward(25)
+                .forward(24)
                 .turn(Math.toRadians(-80))
-                .forward(2)
+                .forward(3.5)
                 .build();
 
         TrajectorySequence right_2 = drive.trajectorySequenceBuilder(right_1.end()) //DONE
                 .back(12)
-                .strafeLeft(12)
-                .back(25)
+                .strafeLeft(13)
+                .back(28)
                 .build();
 
         TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end()) //DONE
@@ -193,7 +193,7 @@ public class AutonBlueLeft extends LinearOpMode {
                 .build();
 
         Globals.ALLIANCE = Globals.Location.BLUE;
-        Globals.SIDE = Globals.Location.LEFT;
+        Globals.SIDE = Globals.Location.CLOSE;
 
         propPipeline = new PropPipeline();
 
