@@ -227,8 +227,6 @@ public class TeleOpMain23 extends LinearOpMode {
 
                 //GAMEPAD1 CONTROLS
 
-
-
                 switch(drive){
                     case FORWARD:
 

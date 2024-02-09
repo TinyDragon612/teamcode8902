@@ -63,7 +63,7 @@ public class AutonBlueRight extends LinearOpMode {
 
     State currentState = State.START;
     public StrikePosition strikePos = StrikePosition.MIDDLE;
-    public static double CV_RUNTIME = 5;
+    public static double CV_RUNTIME = 0;
     public static double FLIP_TIME = 1.5;
     int count;
     private VisionPortal portal;
@@ -123,7 +123,7 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .forward(90)
-                .strafeLeft(30)
+                .strafeLeft(37)
                 .turn(Math.toRadians(190))
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -144,8 +144,8 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end()) //DONE
                 .forward(70)
-                .strafeLeft(17) //15
-                .turn(Math.toRadians(190)) //220
+                .strafeLeft(20)
+                .turn(Math.toRadians(185))
                 .back(19,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -154,11 +154,11 @@ public class AutonBlueRight extends LinearOpMode {
         TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(26)
                 .turn(Math.toRadians(80))
-                .forward(6)
+                .forward(3)
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end())
-                .back(6)
+                .back(3)
                 .strafeRight(30)
                 .build();
 

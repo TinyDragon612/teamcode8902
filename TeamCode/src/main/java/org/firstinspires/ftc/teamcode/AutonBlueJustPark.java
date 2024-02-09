@@ -214,10 +214,6 @@ public class AutonBlueJustPark extends LinearOpMode {
                             bigflip1.setPosition(0.5);
                             bigflip1.setPosition(0.5);
 
-                            while (CVTimer.seconds() < CV_RUNTIME) {
-                                setStrikePosition();
-                            }
-
                             portal.stopStreaming();
                             count++;
                             currentState = State.TRAJECTORY;

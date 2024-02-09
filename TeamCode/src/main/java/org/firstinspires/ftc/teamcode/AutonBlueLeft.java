@@ -121,7 +121,7 @@ public class AutonBlueLeft extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(28)
+                .forward(28.5)
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
