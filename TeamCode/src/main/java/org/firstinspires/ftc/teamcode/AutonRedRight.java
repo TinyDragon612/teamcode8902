@@ -127,14 +127,14 @@ public class AutonRedRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(28)
+                .forward(27.5)
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
                 .back(7.5)
                 .turn(Math.toRadians(90))
                 .back(40)
-                .strafeLeft(5)
+                .strafeLeft(1)
                 .build();
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
@@ -144,7 +144,7 @@ public class AutonRedRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose) //DONE
-                .forward(27)
+                .forward(26.5)
                 .turn(Math.toRadians(80))
                 .forward(3)
                 .build();
@@ -308,8 +308,8 @@ public class AutonRedRight extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_OUT:
                         if (drawersDone(blueboi1, blueboi2)) {
-                            bigflip1.setPosition(0.197);
-                            bigflip2.setPosition(0.803);
+                            bigflip1.setPosition(0.78);
+                            bigflip2.setPosition(.22);
                             drawerTimer.reset();
                             currentState = State.RELEASE;
                         }
@@ -324,8 +324,8 @@ public class AutonRedRight extends LinearOpMode {
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
                             littleflip.setPosition(0.7);
-                            bigflip1.setPosition(0.52);
-                            bigflip2.setPosition(0.48);
+                            bigflip1.setPosition(0.48);
+                            bigflip2.setPosition(0.52);
 
                             drawerTimer.reset();
                             currentState = State.DRAWER_RETRACT;

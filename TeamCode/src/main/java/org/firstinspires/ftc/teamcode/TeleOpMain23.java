@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -39,7 +40,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 
 @TeleOp(name= "\uD83D\uDC7D LoHicimos", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class TeleOpMain23 extends LinearOpMode {
 
     // Declare OpMode members.
@@ -182,8 +183,8 @@ public class TeleOpMain23 extends LinearOpMode {
                     case DRAWER_FLIP_OUT:
                         if (waitforDrawers(blueboi1, blueboi2)) {
 
-                            bigflip1.setPosition(0.195); //.19, .20
-                            bigflip2.setPosition(0.805); //0.81, .8
+                            bigflip1.setPosition(0.78);
+                            bigflip2.setPosition(.22);
 
                             drawerState = State.DRAWER_FLIP_IN;
                         }
@@ -320,16 +321,16 @@ public class TeleOpMain23 extends LinearOpMode {
 
 
                 if (gamepad2.dpad_up) {
-                    bigflip1.setPosition(0.5);
-                    bigflip2.setPosition(0.5);
+                    bigflip1.setPosition(0.5); //.5
+                    bigflip2.setPosition(0.5); //.5
 
                     //flips in
                 }
 
                 if (gamepad2.dpad_down) {
 
-                    bigflip1.setPosition(0.2);
-                    bigflip2.setPosition(0.8);
+                    bigflip1.setPosition(0.795);
+                    bigflip2.setPosition(.205);
 
                 }
 

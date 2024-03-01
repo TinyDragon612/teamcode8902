@@ -63,7 +63,7 @@ public class AutonBlueRight extends LinearOpMode {
 
     State currentState = State.START;
     public StrikePosition strikePos = StrikePosition.MIDDLE;
-    public static double CV_RUNTIME = 0;
+    public static double CV_RUNTIME = 6;
     public static double FLIP_TIME = 1.5;
     int count;
     private VisionPortal portal;
@@ -123,7 +123,7 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .forward(90)
-                .strafeLeft(37)
+                .strafeLeft(40)
                 .turn(Math.toRadians(190))
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -132,7 +132,7 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
                 .forward(28)
-                .turn(Math.toRadians(-80))
+                .turn(Math.toRadians(-75))
                 .forward(3) //4
                 .build();
 
@@ -144,7 +144,7 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end()) //DONE
                 .forward(70)
-                .strafeLeft(20)
+                .strafeLeft(37)
                 .turn(Math.toRadians(185))
                 .back(19,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -295,14 +295,14 @@ public class AutonBlueRight extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_OUT:
                         if (drawersDone(blueboi1, blueboi2)) {
-                            bigflip1.setPosition(0.195); //0.197
-                            bigflip2.setPosition(0.805); //0.803
+                            bigflip1.setPosition(0.78);
+                            bigflip2.setPosition(.22);
                             drawerTimer.reset();
                             currentState = State.RELEASE;
                         }
                         break;
                     case TRAJECTORY4:
-                        if(bigflip1.getPosition()==0.19) {
+                        if(bigflip1.getPosition()==0.78) {
                             drive.setPoseEstimate(startPose);
                             drive.followTrajectorySequence(good);
                         }
@@ -318,8 +318,8 @@ public class AutonBlueRight extends LinearOpMode {
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
                             littleflip.setPosition(0.7);
-                            bigflip1.setPosition(0.52);
-                            bigflip2.setPosition(0.48);
+                            bigflip1.setPosition(0.48);
+                            bigflip2.setPosition(0.52);
 
                             drawerTimer.reset();
                             currentState = State.DRAWER_RETRACT;

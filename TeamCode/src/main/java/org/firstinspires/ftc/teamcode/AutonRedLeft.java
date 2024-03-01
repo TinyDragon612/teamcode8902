@@ -222,8 +222,8 @@ public class AutonRedLeft extends LinearOpMode {
 
                             littleflip.setPosition(0.7);
                             setDrawerHeight(100);
-                            bigflip1.setPosition(0.6);
                             bigflip1.setPosition(0.4);
+                            bigflip2.setPosition(0.6);
 
                             while (CVTimer.seconds() < CV_RUNTIME) {
                                 setStrikePosition();
@@ -290,20 +290,20 @@ public class AutonRedLeft extends LinearOpMode {
                         break;
                     case DRAWER_START:
                         if (!drive.isBusy()) {
-                            setDrawerHeight(600);
+                            setDrawerHeight(520);
                             currentState = State.DRAWER_FLIP_OUT;
                         }
                         break;
                     case DRAWER_FLIP_OUT:
                         if (drawersDone(blueboi1, blueboi2)) {
-                            bigflip1.setPosition(0.197);
-                            bigflip2.setPosition(0.803);
+                            bigflip1.setPosition(0.78);
+                            bigflip2.setPosition(.22);
                             drawerTimer.reset();
                             currentState = State.RELEASE;
                         }
                         break;
                     case TRAJECTORY4:
-                        if(bigflip1.getPosition()== 0.19) {
+                        if(bigflip1.getPosition()== 0.78) {
                             drive.setPoseEstimate(startPose);
                             drive.followTrajectorySequence(good);
                         }

@@ -297,8 +297,8 @@ public class AutonBlueLeft extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_OUT:
                         if (drawersDone(blueboi1, blueboi2)) {
-                            bigflip1.setPosition(0.197);
-                            bigflip2.setPosition(0.803);
+                            bigflip1.setPosition(0.78);
+                            bigflip2.setPosition(.22);
                             drawerTimer.reset();
                             currentState = State.RELEASE;
                         }
@@ -313,8 +313,8 @@ public class AutonBlueLeft extends LinearOpMode {
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
                             littleflip.setPosition(0.7);
-                            bigflip1.setPosition(0.52);
-                            bigflip2.setPosition(0.48);
+                            bigflip1.setPosition(0.48);
+                            bigflip2.setPosition(0.52);
 
                             drawerTimer.reset();
                             currentState = State.DRAWER_RETRACT;
