@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -9,6 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PWMOutputImplEx;
 
 
 @TeleOp(name= "TeleOpNewMain", group="Linear Opmode")
@@ -31,8 +34,7 @@ public class TeleOpNewMain extends LinearOpMode {
 
     private int errorBound = 60;
     int height;
-
-    final double FLIP_TIME = 0.75;
+    final double FLIP_TIME = 1.5;
 
     public enum driveState{
         FORWARD,
@@ -58,6 +60,7 @@ public class TeleOpNewMain extends LinearOpMode {
     ElapsedTime slideTimer = new ElapsedTime();
 
     ElapsedTime littleTimer = new ElapsedTime();
+    double power;
 
 
     @Override
@@ -105,8 +108,11 @@ public class TeleOpNewMain extends LinearOpMode {
         slide1.setZeroPowerBehavior(brake);
         slide2.setZeroPowerBehavior(brake);
 
-        swoosh1.setPosition(0);
-        swoosh2.setPosition(.2);
+        swoosh1.setPosition(.1325);
+        swoosh2.setPosition(0.0675);
+
+        flop1.setPosition(0.97);
+        flop2.setPosition(0.03);
 
         spin.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         spin.setDirection(DcMotorEx.Direction.REVERSE);
@@ -136,7 +142,6 @@ public class TeleOpNewMain extends LinearOpMode {
                 telemetry.addData("State", drawerState);
                 telemetry.addData("slide1 run mode: ", slide1.getMode());
                 telemetry.update();
-
 
                 switch (drawerState) {
                     case CUSTOM:
@@ -170,15 +175,15 @@ public class TeleOpNewMain extends LinearOpMode {
                         }
                         break;
                     case DRAWER_FLIP_OUT:
-                        if (waitforDrawers(slide1, slide2)) {
+                        if (drawersDone(slide1, slide1)) {
 
-                            //swoosh1.setPosition(.1325);
-                            //swoosh2.setPosition(0.0675);
-                            //flop1.setPosition(x)
-                            //flop2.setPosition(x)
+                            swoosh1.setPosition(0);
+                            swoosh2.setPosition(.2);
+                            flop1.setPosition(0.87);
+                            flop2.setPosition(0.13);
 
+                            drawerState = state.DRAWER_FLIP_IN;
                         }
-                        drawerState = state.DRAWER_FLIP_IN;
                         break;
 
                     case DRAWER_FLIP_IN:
@@ -190,10 +195,10 @@ public class TeleOpNewMain extends LinearOpMode {
                         }
 
                         if (gamepad2.x) {
-                            //swoosh1.setPosition(0);
-                            //swoosh2.setPosition(.2);
-                            //flop1.setPosition(x)
-                            //flop2.setPosition(x)
+                            flop1.setPosition(0.97);
+                            flop2.setPosition(0.03);
+                            swoosh1.setPosition(.1325);
+                            swoosh2.setPosition(0.0675);
 
                             drawerTimer.reset();
                             drawerState = state.DRAWER_RETRACT;
@@ -218,7 +223,7 @@ public class TeleOpNewMain extends LinearOpMode {
                     case DRAWER_SETTLE:
                         if (magnetic.isPressed() || magnetic2.isPressed()) {
                             untoPosition(slide1);
-                            untoPosition(slide2);
+                            //untoPosition(slide2);
                             reset();
                             drawerState = state.DRAWER_START;
                         }
@@ -239,6 +244,7 @@ public class TeleOpNewMain extends LinearOpMode {
 
                  */
 
+                /*
                 if(gamepad2.dpad_up){
                     setDrawerHeight(2000);
                 }
@@ -247,6 +253,8 @@ public class TeleOpNewMain extends LinearOpMode {
                     movevertically(slide1, -500, 0.5);
                     movevertically(slide2, -500, 0.5);
                 }
+
+                 */
 
                 spin.setPower(gamepad2.left_stick_y);
 
@@ -263,23 +271,24 @@ public class TeleOpNewMain extends LinearOpMode {
                 }
 
                 if(gamepad1.dpad_left){
-                    flop1.setPosition(0);
-                    flop2.setPosition(1);
+                    flop1.setPosition(0.85);
+                    flop2.setPosition(0.15);
                 }
 
                 if(gamepad1.dpad_right){
-                    flop1.setPosition(1);
-                    flop2.setPosition(0);
+                    //IN POSITION
+                    flop1.setPosition(0.97);
+                    flop2.setPosition(0.03);
                 }
 
                 if(gamepad1.left_bumper){
                     pinch1.setPosition(0);
-                    pinch2.setPosition(0);
+                    pinch2.setPosition(1);
                 }
 
                 if(gamepad1.right_bumper){
-                    pinch1.setPosition(0.5);
-                    pinch2.setPosition(0.5);
+                    pinch1.setPosition(0.35);
+                    pinch2.setPosition(0.9);
                 }
 
                 /*
@@ -324,12 +333,10 @@ public class TeleOpNewMain extends LinearOpMode {
 
                  */
 
-
                 topRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
                 topLeft.setPower(((-gamepad1.left_stick_y + gamepad1.left_stick_x)) + ((gamepad1.right_stick_x)));
                 bottomRight.setPower(((gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
                 bottomLeft.setPower(((-gamepad1.left_stick_y + -gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
-
 
             }
 
@@ -341,7 +348,7 @@ public class TeleOpNewMain extends LinearOpMode {
             slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             slide1.setPower(-1);
-            slide2.setPower(-1);
+            //slide2.setPower(-1);
 
             if(magnetic.isPressed() || magnetic2.isPressed()){
                 break;
@@ -367,7 +374,7 @@ public class TeleOpNewMain extends LinearOpMode {
         height = h;
 
         movevertically(slide1, h, 1);
-        movevertically(slide2, h, 1);
+        //movevertically(slide2, slide1.getCurrentPosition(), 1);
 
         /*
         slideTimer.reset();
