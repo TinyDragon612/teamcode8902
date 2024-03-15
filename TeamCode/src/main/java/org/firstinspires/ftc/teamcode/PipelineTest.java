@@ -28,7 +28,7 @@ public class PipelineTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Globals.ALLIANCE = Location.RED;
+        Globals.ALLIANCE = Location.BLUE;
         Globals.SIDE = Location.FAR;
 
         propPipeline = new PropPipeline();

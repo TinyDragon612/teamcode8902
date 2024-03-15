@@ -36,13 +36,6 @@ public class Test extends LinearOpMode {
     int height;
     final double FLIP_TIME = 1.5;
 
-    public enum driveState {
-        FORWARD,
-        BACKWARD
-    }
-
-    ;
-
     public enum state {
         DRAWER_START,
         DRAWER_FLIP_IN,
@@ -56,7 +49,6 @@ public class Test extends LinearOpMode {
     ;
 
     state drawerState = state.DRAWER_START;
-    driveState drive = driveState.FORWARD;
 
     ElapsedTime drawerTimer = new ElapsedTime();
     ElapsedTime servoTimer = new ElapsedTime();
@@ -90,6 +82,9 @@ public class Test extends LinearOpMode {
         drop = hardwareMap.get(ServoImplEx.class, "drop");
         spin = hardwareMap.get(DcMotorEx.class, "spin");
 
+        spin.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        spin.setDirection(DcMotorEx.Direction.REVERSE);
+
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -112,6 +107,20 @@ public class Test extends LinearOpMode {
                 telemetry.addData("State", drawerState);
                 telemetry.addData("slide1 run mode: ", slide1.getMode());
                 telemetry.update();
+
+                if(gamepad2.y){
+                    drop.setPosition(0.4);
+                }
+
+                if(gamepad2.b){
+                    drop.setPosition(0.35);
+                }
+
+                if(gamepad2.a){
+                    drop.setPosition(0.3);
+                }
+
+                spin.setPower(gamepad2.left_stick_y);
 
 
             }

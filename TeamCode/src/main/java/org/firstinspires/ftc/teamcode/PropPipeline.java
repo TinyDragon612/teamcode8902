@@ -27,20 +27,20 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class PropPipeline implements VisionProcessor {
     private static final boolean DEBUG = true;
-    public static int redLeftX = (int) (220);
-    public static int redLeftY = (int) (320); //550
-    public static int redCenterX = (int) (820);
-    public static int redCenterY = (int) (250); //475
-    public static int blueLeftX = (int) (150);
-    public static int blueLeftY = (int) (350); //525
-    public static int blueCenterX = (int) (750);
-    public static int blueCenterY = (int) (280); //485
+    public static int redLeftX = (int) (1375);
+    public static int redLeftY = (int) (550); //525
+    public static int redCenterX = (int) (750);
+    public static int redCenterY = (int) (570); //485
+    public static int blueLeftX = (int) (1395);
+    public static int blueLeftY = (int) (540); //550
+    public static int blueCenterX = (int) (820);
+    public static int blueCenterY = (int) (560); //475
     public static int leftWidth = (int) (125);
     public static int leftHeight = (int) (125);
     public static int centerWidth = (int) (125);
     public static int centerHeight = (int) (125);
     public static double BLUE_TRESHOLD = 70;
-    public static double RED_TRESHOLD = 100;
+    public static double RED_TRESHOLD = 70;
     private final Mat hsv = new Mat();
     public double leftColor = 0.0;
     public double centerColor = 0.0;

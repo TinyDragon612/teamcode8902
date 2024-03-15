@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PWMOutputImplEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 
 @TeleOp(name= "TeleOpNewMain", group="Linear Opmode")
 //@Disabled
@@ -61,6 +63,8 @@ public class TeleOpNewMain extends LinearOpMode {
 
     ElapsedTime littleTimer = new ElapsedTime();
 
+    double x;
+
 
     @Override
     public void runOpMode() {
@@ -106,6 +110,8 @@ public class TeleOpNewMain extends LinearOpMode {
         slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        slide1.setCurrentAlert(1, CurrentUnit.AMPS);
+
         /*
         slide1.setZeroPowerBehavior(brake);
         slide2.setZeroPowerBehavior(brake);
@@ -142,15 +148,15 @@ public class TeleOpNewMain extends LinearOpMode {
                 telemetry.addData("Program", "Android Studio");
                 telemetry.addData("slide1: ", slide1.getCurrentPosition());
                 telemetry.addData("slide2: ", slide2.getCurrentPosition());
-                //telemetry.addData("swoosh1: ", swoosh1.getPosition());
-                //telemetry.addData("swoosh2: ", swoosh2.getPosition());
-                //telemetry.addData("pinch1: ", pinch1.getPosition());
-                //telemetry.addData("pinch2: ", pinch2.getPosition());
                 telemetry.addData("drop: ", drop.getPosition());
                 telemetry.addData("magnetic1", magnetic.isPressed());
                 telemetry.addData("magnetic2", magnetic2.isPressed());
                 telemetry.addData("State", drawerState);
                 telemetry.addData("slide1 run mode: ", slide1.getMode());
+                telemetry.addData("Powerrrr:", slide1.isOverCurrent());
+                telemetry.addLine("_______________________");
+                telemetry.addData("pinch1: ", pinch1.getPosition());
+                telemetry.addData("pinch2: ", pinch2.getPosition());
                 telemetry.update();
 
                 switch (drawerState) {
@@ -159,13 +165,22 @@ public class TeleOpNewMain extends LinearOpMode {
                         slide1.setZeroPowerBehavior(brake);
                         slide2.setZeroPowerBehavior(brake);
 
-                        slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                        slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
                         //slide2.setPower(-gamepad2.right_stick_y);
-                        slide1.setPower(-gamepad2.right_stick_y);
+                        //slide1.setPower(-gamepad2.right_stick_y);
 
-                        if(gamepad2.left_bumper){
+                        x = -gamepad2.right_stick_y;
+
+                        if(x <= 1 && x > 0){
+                            movevertically(slide1, 9000, x * 10);
+                        }
+                        else if(x >= -1 && x < 0){
+                            movevertically(slide1, 0, x * 10);
+                        }
+                        else{
+                            slide1.setTargetPositionTolerance(slide1.getCurrentPosition());
+                        }
+
+                        if(gamepad2.left_bumper) {
                             slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             drawerState = state.DRAWER_FLIP_IN;
@@ -216,14 +231,6 @@ public class TeleOpNewMain extends LinearOpMode {
                             drawerState = state.DRAWER_RETRACT;
                         }
 
-                        if (gamepad2.y) {
-                            setDrawerHeight(3000);
-                        } else if (gamepad2.b) {
-                            setDrawerHeight(1500);
-                        } else if (gamepad2.a) {
-                            setDrawerHeight(1000);
-                        }
-
                         break;
                     case DRAWER_RETRACT:
                         if (drawerTimer.seconds() >= FLIP_TIME) {
@@ -246,34 +253,8 @@ public class TeleOpNewMain extends LinearOpMode {
                         drawerState = state.DRAWER_START;
                 }
 
+                //OTHER GAMEPAD2 CONTROLS
                 spin.setPower(gamepad2.left_stick_y);
-
-                //GAMEPAD1 CONTROLS
-                if(gamepad1.y){
-                    setDrawerHeight(2000);
-                }
-
-                if(gamepad1.a) {
-                    movevertically(slide1, -500, 0.5);
-                    //movevertically(slide2, -500, 0.5);
-                }
-
-                if(gamepad1.dpad_up){
-                    drop.setPwmEnable();
-                    drop.setPosition(0.9);
-                }
-
-                if(gamepad1.dpad_down){
-                    drop.setPosition(0);
-
-                    if (servoTimer.seconds() > 20) {
-                        drop.setPwmDisable();
-                    }
-                }
-
-                if(gamepad1.touchpad){
-                    launcher.setPosition(0);
-                }
 
                 if(gamepad1.left_bumper){
                     pinch1.setPosition(0.35);
@@ -289,6 +270,39 @@ public class TeleOpNewMain extends LinearOpMode {
 
                 if(gamepad1.right_trigger > 0.5){
                     pinch2.setPosition(1);
+                }
+
+                //GAMEPAD1 CONTROLS
+                if(gamepad1.y){
+                    setDrawerHeight(2000);
+                }
+
+                if(gamepad1.a) {
+                    movevertically(slide1, -600, 0.5);
+                    //movevertically(slide2, -500, 0.5);
+                }
+
+                if(gamepad1.dpad_left){
+                    drop.setPosition(0.9);
+                }
+
+                if(gamepad1.dpad_up){
+                    drop.setPosition(0.35);
+                }
+
+                if(gamepad1.dpad_right){
+                    drop.setPosition(0.3);
+                }
+
+                if(gamepad1.dpad_down){
+                    drop.setPosition(0.27);
+                }
+
+                if(gamepad1.touchpad){
+                    if(launcher.getPosition() != 0)
+                        launcher.setPosition(0);
+                    else
+                        launcher.setPosition(0.6);
                 }
 
                 topRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x)) + (gamepad1.right_stick_x));
