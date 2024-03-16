@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.IMUAuton;
+package org.firstinspires.ftc.teamcode.imuAuton;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;

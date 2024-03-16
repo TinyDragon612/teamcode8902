@@ -8,45 +8,52 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-import org.firstinspires.ftc.teamcode.vision.BluePropThreshold;
+import org.firstinspires.ftc.teamcode.vision.PropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-//@Disabled
-@Config
-@Autonomous(group = "drive")
-public class AutonBlueJustPark extends LinearOpMode {
-    private DcMotorEx blueboi1, blueboi2;
-    private Servo littleflip;
 
-    private Servo bigflip1, bigflip2;
+@Config
+@Autonomous(name = "AutonBlueJustpark", group = "drive")
+public class AutonBlueJustPark extends LinearOpMode {
+
+    private DcMotorEx slide1, slide2; //drawers
+
+    private TouchSensor magnetic, magnetic2;
+
+    private ServoImplEx swoosh1, swoosh2, flop1, flop2, pinch1, pinch2, drop, launcher;
+
+    private DcMotorEx spin;
+
 
     private int errorBound = 60;
 
     int height;
-    private ServoImplEx poolNoodle;
 
+    ElapsedTime CVTimer = new ElapsedTime();
+    public ElapsedTime drawerTimer = new ElapsedTime();
     ElapsedTime servoTimer = new ElapsedTime();
-    ElapsedTime drawerTimer = new ElapsedTime();
-    public  ElapsedTime CVTimer = new ElapsedTime();
+
+    ElapsedTime spinTimer = new ElapsedTime();
+
+    public static double FLIP_TIME = 1.5;
+
+    int count;
 
     public enum State{
         START,
+        CAMERA_SCAN,
         TRAJECTORY,
         PIXEL,
         TRAJECTORY2,
-        DOWN,
-        SETTLE,
-        TRAJECTORY3,
-        DRAWER_SETTLE
     }
 
     public enum StrikePosition{
@@ -55,42 +62,53 @@ public class AutonBlueJustPark extends LinearOpMode {
         RIGHT
     }
 
-    State currentState = State.START;
-    public StrikePosition strikePos = StrikePosition.MIDDLE;
-    public static double CV_RUNTIME = 5;
-    public static double FLIP_TIME = 1.5;
-    int count;
+    public StrikePosition strikePos = StrikePosition.LEFT;
+
+    public State currentState = State.START;
+
+    public static double CV_RUNTIME = 8;
     private VisionPortal portal;
     private PropPipeline propPipeline;
+
+    private DcMotorEx.ZeroPowerBehavior brake = DcMotorEx.ZeroPowerBehavior.BRAKE;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        blueboi1 = hardwareMap.get(DcMotorEx.class, "blueboi1");
-        blueboi2 = hardwareMap.get(DcMotorEx.class, "blueboi2");
+        slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+        slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+        magnetic = hardwareMap.get(TouchSensor.class, "magnetic");
+        magnetic2 = hardwareMap.get(TouchSensor.class, "magnetic2");
+        swoosh1 = hardwareMap.get(ServoImplEx.class, "swoosh1");
+        swoosh2 = hardwareMap.get(ServoImplEx.class, "swoosh2");
+        flop1 = hardwareMap.get(ServoImplEx.class, "flop1");
+        flop2 = hardwareMap.get(ServoImplEx.class, "flop2");
+        pinch1 = hardwareMap.get(ServoImplEx.class, "pinch1");
+        pinch2 = hardwareMap.get(ServoImplEx.class, "pinch2");
+        drop = hardwareMap.get(ServoImplEx.class, "drop");
+        launcher = hardwareMap.get(ServoImplEx.class, "launcher");
+        spin = hardwareMap.get(DcMotorEx.class, "spin");
 
-        littleflip = hardwareMap.get(Servo.class, "littleflip");
-        bigflip1 = hardwareMap.get(Servo.class, "bigflip1");
-        bigflip2 = hardwareMap.get(Servo.class, "bigflip2");
+        slide1.setDirection(DcMotorEx.Direction.FORWARD);
+        slide2.setDirection(DcMotorEx.Direction.REVERSE);
 
-        poolNoodle = hardwareMap.get(ServoImplEx.class, "poolNoodle");
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        blueboi1.setDirection(DcMotorEx.Direction.REVERSE);
-        blueboi2.setDirection(DcMotorEx.Direction.FORWARD);
+        slide1.setTargetPosition(0);
+        slide2.setTargetPosition(0);
 
-        blueboi1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        blueboi2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        blueboi1.setTargetPosition(0);
-        blueboi2.setTargetPosition(0);
+        flop1.setPosition(0.97);
+        flop2.setPosition(0.03);
 
-        blueboi1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        blueboi2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        swoosh1.setPosition(.1325);
+        swoosh2.setPosition(0.0675);
 
-        bigflip1.setPosition(0.5);
-        bigflip2.setPosition(0.5);
-
-        littleflip.setPosition(0.7);
+        pinch1.setPosition(0);
+        pinch2.setPosition(1);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
@@ -105,70 +123,36 @@ public class AutonBlueJustPark extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(29)
+                .forward(26.5)
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
                 .back(15)
-                .strafeRight(20)
-                .forward(35)
-                .turn(Math.toRadians(80))
-                .build();
-
-        TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
-                .forward(90)
-                .strafeLeft(40)
-                .turn(Math.toRadians(200)) //230
-                .back(10,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .strafeRight(19)
+                .forward(32)
+                .turn(Math.toRadians(-95))
+                .back(95)
                 .build();
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
-                .forward(28)
-                .turn(Math.toRadians(-80))
-                .forward(3) //4
+                .forward(26)
+                .turn(Math.toRadians(-95))
+                .forward(1)
                 .build();
 
         TrajectorySequence right_2 = drive.trajectorySequenceBuilder(right_1.end()) //DONE
-                .back(4)
-                .strafeLeft(30)
-                .turn(Math.toRadians(180))
-                .build();
-
-        TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end()) //DONE
-                .forward(70)
-                .strafeLeft(17) //15
-                .turn(Math.toRadians(190)) //220
-                .back(19,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .strafeLeft(20)
+                .back(65)
                 .build();
 
         TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(26)
-                .turn(Math.toRadians(80))
-                .forward(6)
+                .turn(Math.toRadians(95))
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end())
-                .back(6)
-                .strafeRight(30)
-                .build();
-
-        TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
-                .forward(75)
-                .strafeLeft(52)
-                .turn(Math.toRadians(190)) //230
-                .back(10,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        TrajectorySequence good = drive.trajectorySequenceBuilder(startPose)
-                .back(30,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .strafeRight(25)
+                .forward(95)
                 .build();
 
         Globals.ALLIANCE = Globals.Location.BLUE;
@@ -182,8 +166,8 @@ public class AutonBlueJustPark extends LinearOpMode {
                 .addProcessor(propPipeline)
                 .build();
 
-        CVTimer.reset();
         drawerTimer.reset();
+        CVTimer.reset();
 
         while (opModeInInit()) {
 
@@ -198,21 +182,20 @@ public class AutonBlueJustPark extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive() && !isStopRequested()) {
+
             currentState = State.START;
 
             while (opModeIsActive()) {
 
-                telemetry.addData("Prop Position", propPipeline.getLocation());
+                telemetry.addData("Prop Position", strikePos);
                 telemetry.update();
 
                 switch (currentState) {
                     case START:
                         CVTimer.reset();
                         if(count < 1){
-                            littleflip.setPosition(0.7);
-                            setDrawerHeight(100);
-                            bigflip1.setPosition(0.5);
-                            bigflip1.setPosition(0.5);
+
+                            drop.setPosition(0.7);
 
                             portal.stopStreaming();
                             count++;
@@ -220,71 +203,32 @@ public class AutonBlueJustPark extends LinearOpMode {
                         }
                         break;
                     case TRAJECTORY:
-
-                        if (strikePos ==  StrikePosition.MIDDLE) {
+                        if (strikePos == StrikePosition.MIDDLE) {
                             drive.followTrajectorySequence(middle_1);
-                        } else if (strikePos ==  StrikePosition.LEFT) {
+                        } else if (strikePos == StrikePosition.LEFT) {
                             drive.followTrajectorySequence(left_1);
                         } else {
                             drive.followTrajectorySequence(right_1);
                         }
-
+                        spinTimer.reset();
                         currentState = State.PIXEL;
                         break;
                     case PIXEL:
-                        bringDrawersDown();
-                        littleflip.setPosition(0.5);
-                        waitforDrawers(blueboi1, blueboi2);
-                        setDrawerHeight(100);
-                        littleflip.setPosition(0.7);
-                        currentState = State.TRAJECTORY2;
+                        while(spinTimer.seconds() < 3){
+                            spin.setPower(-0.8);
+                        }
+                        if(spinTimer.seconds() > 3){
+                            spin.setPower(0);
+                            currentState = State.TRAJECTORY2;
+                        }
                         break;
                     case TRAJECTORY2:
-                        //drive.setPoseEstimate(startPose);
-                        //drive.followTrajectorySequence(good);
-
                         if (strikePos == StrikePosition.MIDDLE) {
                             drive.followTrajectorySequence(middle_2);
                         } else if (strikePos == StrikePosition.LEFT) {
                             drive.followTrajectorySequence(left_2);
                         } else {
                             drive.followTrajectorySequence(right_2);
-                        }
-
-                        currentState = State.DOWN;
-                        break;
-                    case DOWN:
-                        if(!drive.isBusy()){
-                            poolNoodleDown();
-                            bringDrawersDown();
-                        }
-                        currentState = State.SETTLE;
-                        break;
-                    case SETTLE:
-                        if (drawersDone(blueboi1, blueboi2)) {
-                            untoPosition(blueboi1);
-                            untoPosition(blueboi2);
-                        }
-                        currentState = State.TRAJECTORY3;
-                        break;
-                    case TRAJECTORY3:
-                        if (strikePos == StrikePosition.MIDDLE) {
-                            drive.followTrajectorySequence(middle_3);
-                        } else if (strikePos == StrikePosition.LEFT) {
-                            drive.followTrajectorySequence(left_3);
-                        } else {
-                            drive.followTrajectorySequence(right_3);
-                        }
-
-                        currentState = State.DRAWER_SETTLE;
-                        break;
-                    case DRAWER_SETTLE:
-                        if ((drawerTimer.seconds() >= 1.5) && drawersDone(blueboi1, blueboi2)) {
-                            littleflip.setPosition(0.5);
-                            untoPosition(blueboi1);
-                            untoPosition(blueboi2);
-
-                            drawerTimer.reset();
                         }
                         currentState = State.START;
                         break;
@@ -299,64 +243,14 @@ public class AutonBlueJustPark extends LinearOpMode {
 
     public void setStrikePosition(){
         if (propPipeline.getLocation() == Globals.Location.LEFT) {
-            strikePos = AutonBlueJustPark.StrikePosition.LEFT;
+            strikePos = StrikePosition.LEFT;
         }
         else if (propPipeline.getLocation() == Globals.Location.RIGHT) {
-            strikePos = AutonBlueJustPark.StrikePosition.RIGHT;
+            strikePos = StrikePosition.RIGHT;
         }
         else {
-            strikePos = AutonBlueJustPark.StrikePosition.MIDDLE;
+            strikePos = StrikePosition.MIDDLE;
         }
     }
-
-    public boolean drawersDone(DcMotor george, DcMotor BobbyLocks) {
-        return ((george.getCurrentPosition() > george.getTargetPosition() - errorBound && george.getCurrentPosition() < george.getTargetPosition() + errorBound) &&
-                (BobbyLocks.getCurrentPosition() > BobbyLocks.getTargetPosition() - errorBound && BobbyLocks.getCurrentPosition() < BobbyLocks.getTargetPosition() + errorBound));
-    }
-
-    public void movevertically(DcMotorEx lipsey, int position, double power) {
-        untoPosition(lipsey);
-        runtoPosition(lipsey);
-        lipsey.setTargetPosition(lipsey.getCurrentPosition() + position);
-        lipsey.setPower(power);
-
-    }
-
-    public void runtoPosition(DcMotorEx John) {
-        John.setTargetPosition(0);
-        John.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        John.setPower(0);
-    }
-
-    public void untoPosition(DcMotorEx Neil) {
-        Neil.setPower(0);
-        Neil.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    private void poolNoodleDown(){
-        servoTimer.reset();
-        poolNoodle.setPosition(0.7);
-
-        if(servoTimer.seconds() > 20){
-            poolNoodle.setPwmDisable();
-        }
-    }
-
-    public void bringDrawersDown(){
-        movevertically(blueboi1, -height-50, 1);
-        movevertically(blueboi2, -height-50, 1);
-    }
-
-    public void setDrawerHeight(int h){
-        height = h;
-        movevertically(blueboi1, h, 1);
-        movevertically(blueboi2, h, 1);
-    }
-
-    public boolean waitforDrawers(DcMotor george, DcMotor BobbyLocks) {
-        return ((george.getCurrentPosition() > george.getTargetPosition() - errorBound && george.getCurrentPosition() < george.getTargetPosition() + errorBound) &&
-                (BobbyLocks.getCurrentPosition() > BobbyLocks.getTargetPosition() - errorBound && BobbyLocks.getCurrentPosition() < BobbyLocks.getTargetPosition() + errorBound));
-    }
-
 
 }
