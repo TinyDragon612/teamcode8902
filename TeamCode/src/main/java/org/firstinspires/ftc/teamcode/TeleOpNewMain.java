@@ -124,7 +124,7 @@ public class TeleOpNewMain extends LinearOpMode {
         flop1.setPosition(0.97);
         flop2.setPosition(0.03);
 
-        drop.setPosition(0.9);
+        drop.setPosition(0.7);
 
         pinch1.setPosition(0.35);
         pinch2.setPosition(0.9);
@@ -200,6 +200,7 @@ public class TeleOpNewMain extends LinearOpMode {
                         }
                         break;
                     case DRAWER_FLIP_OUT:
+
                         if (drawersDone(slide1, slide1)) {
 
                             swoosh1.setPosition(0);
@@ -220,10 +221,10 @@ public class TeleOpNewMain extends LinearOpMode {
                         }
 
                         if (gamepad2.x) {
-                            flop1.setPosition(0.97);
-                            flop2.setPosition(0.03);
-                            swoosh1.setPosition(.1325);
-                            swoosh2.setPosition(0.0675);
+                            flop1.setPosition(0.98);
+                            flop2.setPosition(0.02);
+                            swoosh1.setPosition(.133);
+                            swoosh2.setPosition(0.067);
                             pinch1.setPosition(0);
                             pinch2.setPosition(1);
 
@@ -256,6 +257,21 @@ public class TeleOpNewMain extends LinearOpMode {
                 //OTHER GAMEPAD2 CONTROLS
                 spin.setPower(gamepad2.left_stick_y);
 
+                if(gamepad2.dpad_down){
+                    slide1.setMotorDisable();
+                    drawerState = state.DRAWER_START;
+                }
+
+                if(gamepad2.dpad_up){
+                    slide1.setMotorEnable();
+                    reset();
+                }
+
+                if(gamepad2.dpad_down){
+                    drawerState = state.DRAWER_START;
+                    slide1.setMotorDisable();
+                }
+
                 if(gamepad1.left_bumper){
                     pinch1.setPosition(0.35);
                 }
@@ -282,27 +298,32 @@ public class TeleOpNewMain extends LinearOpMode {
                     //movevertically(slide2, -500, 0.5);
                 }
 
+                if(gamepad1.x){
+                    bringDrawersDown();
+
+                    if(magnetic.isPressed() || magnetic2.isPressed()){
+                        reset();
+                    }
+                }
+
                 if(gamepad1.dpad_left){
-                    drop.setPosition(0.9);
+                    drop.setPosition(0.7);
                 }
 
                 if(gamepad1.dpad_up){
-                    drop.setPosition(0.35);
-                }
-
-                if(gamepad1.dpad_right){
                     drop.setPosition(0.3);
                 }
 
-                if(gamepad1.dpad_down){
+                if(gamepad1.dpad_right){
                     drop.setPosition(0.27);
                 }
 
+                if(gamepad1.dpad_down){
+                    drop.setPosition(0.25);
+                }
+
                 if(gamepad1.touchpad){
-                    if(launcher.getPosition() != 0)
-                        launcher.setPosition(0);
-                    else
-                        launcher.setPosition(0.6);
+                    launcher.setPosition(0);
                 }
 
                 topRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x)) + (gamepad1.right_stick_x));

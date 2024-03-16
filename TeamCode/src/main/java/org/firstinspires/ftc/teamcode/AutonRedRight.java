@@ -152,12 +152,13 @@ public class AutonRedRight extends LinearOpMode {
                 .back(7.5)
                 .turn(Math.toRadians(90))
                 .back(34)
-                .strafeRight(7.5)
+                .strafeRight(8.5)
+                .back(2)
                 .build();
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .forward(5)
-                .strafeLeft(25)
+                .strafeLeft(26)
                 .back(15)
                 .build();
 
@@ -168,7 +169,7 @@ public class AutonRedRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end()) //DONE
-                .back(25)
+                .back(35)
                 .strafeRight(10) //og 1.5
                 .back(10,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -183,12 +184,12 @@ public class AutonRedRight extends LinearOpMode {
 
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
-                .lineToLinearHeading(new Pose2d(37, -15, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(37, -14, Math.toRadians(90)))
                 .build();
 
         TrajectorySequence right_2 = drive.trajectorySequenceBuilder(right_1.end()) //DONE
                 .back(15)
-                .strafeLeft(3)
+                .strafeLeft(5)
                 .back(20,
                         SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -263,7 +264,7 @@ public class AutonRedRight extends LinearOpMode {
                         CVTimer.reset();
                         if(count < 1){
 
-                            drop.setPosition(0.9);
+                            drop.setPosition(0.7);
 
                             portal.stopStreaming();
                             count++;
@@ -282,10 +283,10 @@ public class AutonRedRight extends LinearOpMode {
                         currentState = State.PIXEL;
                         break;
                     case PIXEL:
-                        while(spinTimer.seconds() < 3){
+                        while(spinTimer.seconds() < 2){
                             spin.setPower(-0.8);
                         }
-                        if(spinTimer.seconds() > 3){
+                        if(spinTimer.seconds() > 2){
                             spin.setPower(0);
                             currentState = State.TRAJECTORY2;
                         }
@@ -326,10 +327,10 @@ public class AutonRedRight extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
-                            flop1.setPosition(0.97);
-                            flop2.setPosition(0.03);
-                            swoosh1.setPosition(.1325);
-                            swoosh2.setPosition(0.0675);
+                            flop1.setPosition(0.98);
+                            flop2.setPosition(0.02);
+                            swoosh1.setPosition(.133);
+                            swoosh2.setPosition(0.067);
                             pinch1.setPosition(0);
                             pinch2.setPosition(1);
 

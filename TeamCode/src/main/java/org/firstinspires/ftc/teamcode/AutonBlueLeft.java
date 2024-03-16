@@ -139,21 +139,21 @@ public class AutonBlueLeft extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(26)
+                .forward(26.5)
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
                 .back(7.5)
                 .turn(Math.toRadians(-90))
                 .back(30)
-                .strafeLeft(7)
+                .strafeLeft(9)
                 .back(25)
                 .build();
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .forward(5)
-                .strafeRight(30)
-                .back(20)
+                .strafeRight(25)
+                .back(15)
                 .build();
 
         /*
@@ -176,18 +176,18 @@ public class AutonBlueLeft extends LinearOpMode {
          */
 
         TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose) //DONE
-                .lineToLinearHeading(new Pose2d(37, 20, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(39, 25, Math.toRadians(-90)))
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end()) //DONE
-                .back(26)
-                .strafeRight(6)
+                .back(27)
+                .strafeRight(4)
                 .build();
 
         TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
                 .forward(5)
                 .strafeRight(23)
-                .back(20)
+                .back(15)
                 .build();
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
@@ -199,7 +199,7 @@ public class AutonBlueLeft extends LinearOpMode {
         TrajectorySequence right_2 = drive.trajectorySequenceBuilder(right_1.end()) //DONE
                 .back(12)
                 .strafeLeft(10)
-                .back(30)
+                .back(20)
                 .build();
 
         TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end()) //DONE
@@ -248,7 +248,7 @@ public class AutonBlueLeft extends LinearOpMode {
                         CVTimer.reset();
                         if(count < 1){
 
-                            drop.setPosition(0.9);
+                            drop.setPosition(0.7);
 
                             portal.stopStreaming();
                             count++;
@@ -311,10 +311,10 @@ public class AutonBlueLeft extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
-                            flop1.setPosition(0.97);
-                            flop2.setPosition(0.03);
-                            swoosh1.setPosition(.1325);
-                            swoosh2.setPosition(0.0675);
+                            flop1.setPosition(0.98);
+                            flop2.setPosition(0.02);
+                            swoosh1.setPosition(.133);
+                            swoosh2.setPosition(0.067);
                             pinch1.setPosition(0);
                             pinch2.setPosition(1);
 

@@ -4,6 +4,7 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,14 +18,14 @@ import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-import org.firstinspires.ftc.teamcode.vision.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.vision.BluePropThreshold;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-
+//MODIFIED FROM BLUE LEFT
 @Config
-@Autonomous(name = "\uD83D\uDFE5 AutonRedLeft", group = "drive")
-public class AutonRedLeft extends LinearOpMode {
+@Autonomous(name= "wacky stacky", group = "drive")
+public class stackTest extends LinearOpMode {
 
     private DcMotorEx slide1, slide2; //drawers
 
@@ -42,7 +43,6 @@ public class AutonRedLeft extends LinearOpMode {
     ElapsedTime CVTimer = new ElapsedTime();
     public ElapsedTime drawerTimer = new ElapsedTime();
     ElapsedTime servoTimer = new ElapsedTime();
-
     ElapsedTime spinTimer = new ElapsedTime();
 
     public static double FLIP_TIME = 1.5;
@@ -51,20 +51,20 @@ public class AutonRedLeft extends LinearOpMode {
 
     public enum State{
         START,
-        CAMERA_SCAN,
         TRAJECTORY,
         PIXEL,
         TRAJECTORY2,
         DOWN,
         SETTLE,
-        TRAJECTORY3,
         DRAWER_START,
         DRAWER_FLIP_OUT,
-        TRAJECTORY4,
-        RELEASE,
         DRAWER_FLIP_IN,
         DRAWER_RETRACT,
-        DRAWER_SETTLE
+        DRAWER_SETTLE,
+        RELEASE,
+        TRAJECTORY3,
+        LOCK_IN,
+        TRAJECTORY4
     }
 
     public enum StrikePosition{
@@ -79,7 +79,7 @@ public class AutonRedLeft extends LinearOpMode {
 
     public static double CV_RUNTIME = 8;
     private VisionPortal portal;
-    private PropPipeline propPipeline;
+    private PropPipeline propPipeline = new PropPipeline();;
 
     private DcMotorEx.ZeroPowerBehavior brake = DcMotorEx.ZeroPowerBehavior.BRAKE;
 
@@ -126,11 +126,63 @@ public class AutonRedLeft extends LinearOpMode {
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
-        TrajectorySequence justPark = drive.trajectorySequenceBuilder(startPose)
-                .forward(53)
-                .turn(Math.toRadians(-90))
-                .forward(120)
-                .strafeRight(15)
+        TrajectorySequence basic = drive.trajectorySequenceBuilder(startPose)
+                .forward(26)
+                .addDisplacementMarker(() -> {
+                    spinTimer.reset();
+                    while(spinTimer.seconds() < 1.5){
+                        spin.setPower(-0.9);
+                    }
+                    if(spinTimer.seconds() > 1.5){
+                        spin.setPower(0);
+                    }
+                })
+                .back(7.5)
+                .turn(Math.toRadians(-93))
+                .back(30)
+                .strafeLeft(6)
+                .back(22)
+                .addTemporalMarker(4.5, () -> {
+                    setDrawerHeight(1500);
+                })
+                .addTemporalMarker(6, () ->{
+                    swoosh1.setPosition(0);
+                    swoosh2.setPosition(.2);
+                    flop1.setPosition(0.87);
+                    flop2.setPosition(0.13);
+                })
+                .addTemporalMarker(8, () ->{
+                    pinch1.setPosition(0.35);
+                    pinch2.setPosition(0.9);
+                })
+                .addTemporalMarker(9.5, () ->{
+                    flop1.setPosition(0.97);
+                    flop2.setPosition(0.03);
+                    swoosh1.setPosition(.1325);
+                    swoosh2.setPosition(0.0675);
+                    pinch1.setPosition(0);
+                    pinch2.setPosition(1);
+                })
+                .addTemporalMarker(12, () ->{
+                    bringDrawersDown();
+                })
+                .addTemporalMarker(13.5, () ->{
+                    pinch1.setPosition(0.35);
+                    pinch2.setPosition(0.9);
+                    untoPosition(slide1);
+                    slide1.setPower(0);
+                })
+                .forward(110)
+                .addDisplacementMarker(15, () ->{
+                    spinTimer.reset();
+                    lock_in();
+                 })
+                .back(110)
+                .build();
+
+        TrajectorySequence basicPark = drive.trajectorySequenceBuilder(basic.end())
+                .strafeRight(20)
+                .back(20)
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
@@ -138,64 +190,62 @@ public class AutonRedLeft extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
-                .back(15)
-                .strafeLeft(15)
-                .forward(32)
-                .turn(Math.toRadians(-90))
+                .lineToLinearHeading(new Pose2d(24, 40, Math.toRadians(-93)))
+                .addTemporalMarker(1, () ->{
+                    setDrawerHeight(1500);
+                })
+                .back(15,
+                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
-                .forward(70)
-                .strafeRight(35)
-                .turn(Math.toRadians(190))
-                .back(30)
+                .addTemporalMarker(0, () ->{
+                    bringDrawersDown();
+                })
+                .addTemporalMarker(3, () ->{
+                    pinch1.setPosition(0.35);
+                    pinch2.setPosition(0.9);
+                    untoPosition(slide1);
+                    slide1.setPower(0);
+                })
+                .lineTo(new Vector2d(65, 0))
+                .forward(90)
+                .strafeRight(4)
                 .build();
 
-        TrajectorySequence left_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(26)
-                .turn(Math.toRadians(90))
+        TrajectorySequence middle_4 = drive.trajectorySequenceBuilder(middle_3.end())
+                .turn(Math.toRadians(-10))
+                .lineToConstantHeading(new Vector2d(65, 0))
+                .lineTo(new Vector2d(28, 40))
+                .addTemporalMarker(2, () ->{
+                    setDrawerHeight(1500);
+                })
+                .addTemporalMarker(1, () -> {
+                    if(pinch1.getPosition() == 0){
+                        spin.setPower(-1);
+                    }
+
+                    if(spinTimer.seconds() > 3){
+                        spin.setPower(0);
+                    }
+                })
                 .build();
 
-        TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end())
-                .strafeRight(19)
+        TrajectorySequence basic2 = drive.trajectorySequenceBuilder(startPose)
+                .addTemporalMarker(0, () ->{
+                    pinch1.setPosition(0.35);
+                    pinch2.setPosition(0.9);
+                })
+                .forward(15)
                 .build();
 
-        TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
-                .back(65)
-                .strafeLeft(8)
-                .back(21)
+        TrajectorySequence basic3 = drive.trajectorySequenceBuilder(basic2.end())
+                .back(15)
                 .build();
 
-        TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(27)
-                .turn(Math.toRadians(-90))
-                .forward(4)
-                .build();
-
-        TrajectorySequence right_2 = drive.trajectorySequenceBuilder(right_1.end())
-                .back(4)
-                .strafeLeft(14)
-                .build();
-
-        TrajectorySequence right_3 = drive.trajectorySequenceBuilder(right_2.end())
-                .forward(70)
-                .strafeRight(28)
-                .turn(Math.toRadians(180))
-                .back(25,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        TrajectorySequence good = drive.trajectorySequenceBuilder(startPose)
-                .back(20,
-                        SampleMecanumDrive.getVelocityConstraint(9, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        Globals.ALLIANCE = Globals.Location.RED;
-        Globals.SIDE = Globals.Location.FAR;
-
-        propPipeline = new PropPipeline();
+        Globals.ALLIANCE = Globals.Location.BLUE;
+        Globals.SIDE = Globals.Location.CLOSE;
 
         portal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
@@ -219,12 +269,17 @@ public class AutonRedLeft extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive() && !isStopRequested()) {
+            spinTimer.reset();
 
-            currentState = State.START;
+
+            currentState = State.TRAJECTORY3;
+            count++;
 
             while (opModeIsActive()) {
 
                 telemetry.addData("Prop Position", strikePos);
+                telemetry.addData("state:", currentState);
+                telemetry.addData("bussin: " , drive.isBusy());
                 telemetry.update();
 
                 switch (currentState) {
@@ -240,50 +295,24 @@ public class AutonRedLeft extends LinearOpMode {
                         }
                         break;
                     case TRAJECTORY:
-                        if (strikePos == StrikePosition.MIDDLE) {
-                            drive.followTrajectorySequence(middle_1);
-                        } else if (strikePos == StrikePosition.LEFT) {
-                            drive.followTrajectorySequence(left_1);
-                        } else {
-                            drive.followTrajectorySequence(right_1);
-                        }
+                        drive.followTrajectorySequence(middle_1);
                         spinTimer.reset();
                         currentState = State.PIXEL;
                         break;
                     case PIXEL:
-                        while(spinTimer.seconds() < 2){
-                            spin.setPower(-0.7);
-                        }
-                        if(spinTimer.seconds() > 2){
-                            spin.setPower(0);
-                            currentState = State.TRAJECTORY2;
+                        if(!drive.isBusy()){
+                            while(spinTimer.seconds() < 1){
+                                spin.setPower(-0.8);
+                            }
+                            if(spinTimer.seconds() > 1){
+                                spin.setPower(0);
+                                currentState = State.TRAJECTORY2;
+                            }
                         }
                         break;
                     case TRAJECTORY2:
-                        if (strikePos == StrikePosition.MIDDLE) {
-                            drive.followTrajectorySequence(middle_2);
-                        } else if (strikePos == StrikePosition.LEFT) {
-                            drive.followTrajectorySequence(left_2);
-                        } else {
-                            drive.followTrajectorySequence(right_2);
-                        }
-                        currentState = State.TRAJECTORY3;
-                        break;
-                    case TRAJECTORY3:
-                        if (strikePos == StrikePosition.MIDDLE) {
-                            drive.followTrajectorySequence(middle_3);
-                        } else if (strikePos == StrikePosition.LEFT) {
-                            drive.followTrajectorySequence(left_3);
-                        } else {
-                            drive.followTrajectorySequence(right_3);
-                        }
-                        currentState = State.DRAWER_START;
-                        break;
-                    case DRAWER_START:
-                        if (!drive.isBusy()) {
-                            setDrawerHeight(1500);
-                            currentState = State.DRAWER_FLIP_OUT;
-                        }
+                        drive.followTrajectorySequence(middle_2);
+                        currentState = State.DRAWER_FLIP_OUT;
                         break;
                     case DRAWER_FLIP_OUT:
                         if (drawersDone(slide1, slide2)) {
@@ -295,32 +324,32 @@ public class AutonRedLeft extends LinearOpMode {
                             currentState = State.RELEASE;
                         }
                         break;
-                    case TRAJECTORY4:
-                        if(flop1.getPosition()== 0.87) {
-                            drive.setPoseEstimate(startPose);
-                            drive.followTrajectorySequence(good);
-                        }
-                        currentState = State.RELEASE;
-                        break;
                     case RELEASE:
-                        if(drawerTimer.seconds() > 2){
+                        if(drawerTimer.seconds() > 1){
                             pinch1.setPosition(0.35);
                             pinch2.setPosition(0.9);
                             drawerTimer.reset();
-                            currentState = State.DRAWER_FLIP_IN;
+                            currentState = State.DRAWER_FLIP_IN;;
                         }
                         break;
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
-                            flop1.setPosition(0.98);
-                            flop2.setPosition(0.02);
-                            swoosh1.setPosition(.133);
-                            swoosh2.setPosition(0.067);
+                            flop1.setPosition(0.97);
+                            flop2.setPosition(0.03);
+                            swoosh1.setPosition(.1325);
+                            swoosh2.setPosition(0.0675);
                             pinch1.setPosition(0);
                             pinch2.setPosition(1);
 
                             drawerTimer.reset();
-                            currentState = State.DRAWER_RETRACT;
+
+                            if(count < 2){
+                                count++;
+                                currentState = State.TRAJECTORY3;
+                            }
+                            else{
+                                currentState = State.DRAWER_RETRACT;
+                            }
                         }
                         break;
                     case DRAWER_RETRACT:
@@ -336,17 +365,62 @@ public class AutonRedLeft extends LinearOpMode {
                             pinch1.setPosition(0.35);
                             pinch2.setPosition(0.9);
                             untoPosition(slide1);
-                            reset();
-
+                            slide1.setPower(0);
                             drawerTimer.reset();
                         }
                         currentState = State.START;
                         break;
+                    case TRAJECTORY3:
+                        /*
+                        if (drawerTimer.seconds() > FLIP_TIME) {
+                            drive.followTrajectorySequence(middle_3);
+                        }
+
+                         */
+
+                        drive.followTrajectorySequence(basic2);
+                        spinTimer.reset();
+                        if(!drive.isBusy() && drawerTimer.seconds() > 3){
+                            spinTimer.reset();
+                            currentState = State.LOCK_IN;
+                        }
+                        break;
+                    case LOCK_IN:
+                        if(!drive.isBusy()){
+                            drop.setPosition(0.31);
+
+                            while(spinTimer.seconds() < 3){
+                                spin.setPower(1);
+                            }
+
+                            if(spinTimer.seconds() > 2){
+                                drop.setPosition(.29);
+                            }
+
+                            if(spinTimer.seconds() > 1.5){
+                                pinch1.setPosition(0);
+                                pinch2.setPosition(1);
+                            }
+                        }
+
+                        if(spinTimer.seconds() > 3.5){
+                            spin.setPower(-1);
+                            currentState = State.TRAJECTORY4;
+                        }
+
+                        break;
+                    case TRAJECTORY4:
+                        /*
+                        drive.followTrajectorySequence(middle_4);
+                        currentState = State.DRAWER_FLIP_OUT;
+                         */
+                        drive.followTrajectorySequence(basic3);
+                        currentState = State.START;
+                        break;
                     default:
                         currentState = State.START;
-
-
                 }
+
             }
         }
     }
@@ -426,6 +500,24 @@ public class AutonRedLeft extends LinearOpMode {
     public void stall(DcMotorEx DcMotar) {
         DcMotar.setZeroPowerBehavior(brake);
         DcMotar.setPower(0);
+    }
+    public void lock_in(){
+        drop.setPosition(0.35);
+
+        while(spinTimer.seconds() < 2){
+            spin.setPower(1);
+        }
+
+        pinch1.setPosition(0);
+        pinch2.setPosition(1);
+
+        if(pinch1.getPosition() == 0){
+            spin.setPower(-1);
+        }
+
+        if(spinTimer.seconds() > 5){
+            spin.setPower(0);
+        }
     }
 
 

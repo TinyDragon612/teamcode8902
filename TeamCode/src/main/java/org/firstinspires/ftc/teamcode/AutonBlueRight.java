@@ -134,7 +134,7 @@ public class AutonBlueRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle_1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(25)
+                .forward(26.5)
                 .build();
 
         TrajectorySequence middle_2 = drive.trajectorySequenceBuilder(middle_1.end())
@@ -146,8 +146,8 @@ public class AutonBlueRight extends LinearOpMode {
 
         TrajectorySequence middle_3 = drive.trajectorySequenceBuilder(middle_2.end())
                 .back(90)
-                .strafeRight(23)
-                .back(13)
+                .strafeRight(22)
+                .back(18)
                 .build();
 
         TrajectorySequence right_1 = drive.trajectorySequenceBuilder(startPose) //DONE
@@ -172,12 +172,12 @@ public class AutonBlueRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence left_2 = drive.trajectorySequenceBuilder(left_1.end())
-                .strafeRight(27)
+                .strafeRight(25)
                 .build();
 
         TrajectorySequence left_3 = drive.trajectorySequenceBuilder(left_2.end())
                 .forward(75)
-                .strafeLeft(40)
+                .strafeLeft(42)
                 .turn(Math.toRadians(190)) //230
                 .back(15)
                 .build();
@@ -228,7 +228,7 @@ public class AutonBlueRight extends LinearOpMode {
                         CVTimer.reset();
                         if(count < 1){
 
-                            drop.setPosition(0.9);
+                            drop.setPosition(0.7);
 
                             portal.stopStreaming();
                             count++;
@@ -308,10 +308,10 @@ public class AutonBlueRight extends LinearOpMode {
                         break;
                     case DRAWER_FLIP_IN:
                         if (drawerTimer.seconds() > 1.5) {
-                            flop1.setPosition(0.97);
-                            flop2.setPosition(0.03);
-                            swoosh1.setPosition(.1325);
-                            swoosh2.setPosition(0.0675);
+                            flop1.setPosition(0.98);
+                            flop2.setPosition(0.02);
+                            swoosh1.setPosition(.133);
+                            swoosh2.setPosition(0.067);
                             pinch1.setPosition(0);
                             pinch2.setPosition(1);
 
